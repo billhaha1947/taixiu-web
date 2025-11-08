@@ -1,32 +1,16 @@
-import express from "express";
-const { db } = require("./firebaseAdmin.js");
+const express = require("express");
 const router = express.Router();
+const { db } = require("./firebaseAdmin");
 
-// Lấy danh sách user
-router.get("/users", async (req, res) => {
+router.get("/history", async (req, res) => {
   try {
-    const snapshot = await db.collection("users").get();
-    const users = snapshot.docs.map((doc) => doc.data());
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    const snapshot = await db.collection("games").orderBy("timestamp", "desc").limit(20).get();
+    const history = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json({ success: true, history });
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy lịch sử:", error);
+    res.status(500).json({ error: "Không thể lấy dữ liệu lịch sử" });
   }
 });
 
-// Xóa toàn bộ lịch sử game
-router.delete("/clear-history", async (req, res) => {
-  try {
-    const snapshot = await db.collection("games").get();
-    const batch = db.batch();
-    snapshot.forEach((doc) => batch.delete(doc.ref));
-    await batch.commit();
-
-    res.json({ success: true, message: "Đã xóa toàn bộ lịch sử." });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-export default router;
+module.exports = router;
