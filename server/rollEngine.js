@@ -1,5 +1,5 @@
 // server/rollEngine.js
-import admin from "./firebaseAdmin.js"; // Import Firestore Admin SDK
+import { db } from './firebaseAdmin.js';
 import { Server } from "socket.io";
 
 const db = admin.firestore();
