@@ -1,30 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Tài Xỉu</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang Admin</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>👑 Admin Control</h1>
-
-    <label for="mode">Chọn chế độ kết quả:</label>
-    <select id="mode">
-      <option value="random">Ngẫu nhiên</option>
-      <option value="taiMore">Tỉ lệ Tài cao</option>
-      <option value="xiuMore">Tỉ lệ Xỉu cao</option>
-      <option value="allTai">Toàn Tài</option>
-      <option value="allXiu">Toàn Xỉu</option>
-    </select>
-
-    <h3>💰 Chỉnh tiền người chơi</h3>
-    <input id="userId" placeholder="ID người chơi">
-    <input id="newBalance" type="number" placeholder="Số dư mới">
-    <button id="updateBalance">Cập nhật</button>
-  </div>
-
+  <h1>🛠 Quản lý dữ liệu</h1>
+  <button id="clearBtn">Xóa toàn bộ lịch sử 🎯</button>
+  <p id="status"></p>
   <script src="admin.js"></script>
 </body>
 </html>
