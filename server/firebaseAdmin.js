@@ -1,5 +1,9 @@
 import admin from "firebase-admin";
-import serviceAccount from "../firebase-key.json" assert { type: "json" };
+import fs from "fs";
+
+const serviceAccount = JSON.parse(
+  fs.readFileSync(new URL("../firebase-key.json", import.meta.url))
+);
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -7,5 +11,5 @@ if (!admin.apps.length) {
   });
 }
 
-export const db = admin.firestore();
-export { admin };
+const db = admin.firestore();
+export { admin, db };
