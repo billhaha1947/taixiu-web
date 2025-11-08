@@ -1,15 +1,23 @@
 // server/firebaseAdmin.js
 import admin from "firebase-admin";
-import dotenv from "dotenv";
+import { getFirestore } from "firebase-admin/firestore";
 
-dotenv.config();
+// Nếu chưa khởi tạo thì mới khởi tạo Firebase Admin (tránh lỗi khi hot reload)
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      type: "service_account",
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+    }),
+  });
+}
 
-const app = admin.initializeApp({
-  credential: admin.credential.cert({
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  }),
-});
+// Lấy Firestore Database
+const db = getFirestore();
 
-export default app;
+// Xuất để file khác dùng
+export { admin, db };
