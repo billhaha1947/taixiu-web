@@ -1,27 +1,12 @@
-const { db } = require("./firebaseAdmin");
-
-async function rollDiceAndSaveResult(userId, betType, betAmount) {
+function rollDice() {
   const dice1 = Math.floor(Math.random() * 6) + 1;
   const dice2 = Math.floor(Math.random() * 6) + 1;
   const dice3 = Math.floor(Math.random() * 6) + 1;
-  const total = dice1 + dice2 + dice3;
+  const sum = dice1 + dice2 + dice3;
 
-  let result = total >= 11 ? "tài" : "xỉu";
-  let win = betType === result;
+  let result = sum >= 11 ? "Tài" : "Xỉu";
 
-  const record = {
-    userId,
-    betType,
-    betAmount,
-    dice: [dice1, dice2, dice3],
-    total,
-    result,
-    win,
-    timestamp: new Date(),
-  };
-
-  await db.collection("games").add(record);
-  return record;
+  return { dice1, dice2, dice3, sum, result };
 }
 
-module.exports = { rollDiceAndSaveResult };
+module.exports = rollDice;
