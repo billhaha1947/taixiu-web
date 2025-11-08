@@ -1,5 +1,5 @@
 import express from "express";
-import { db } from "./firebaseAdmin.js";
+const { db } = require("./firebaseAdmin.js");
 import { rollDice } from "./rollEngine.js";
 
 const router = express.Router();
