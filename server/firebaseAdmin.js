@@ -12,7 +12,6 @@ try {
 
   const db = admin.firestore();
   module.exports = { db };
-
 } catch (error) {
   console.error("❌ Firebase Admin initialization failed:", error);
   throw new Error("Firebase initialization error");
