@@ -1,1 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập | Tài Xỉu Vui Vẻ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎲 Tài Xỉu Vui Vẻ</h1>
+    <h3 id="formTitle">Đăng nhập</h3>
 
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Mật khẩu" />
+    <input id="username" placeholder="Tên hiển thị" style="display:none" />
+
+    <button id="authBtn">Đăng nhập</button>
+
+    <p id="toggleForm">
+      Chưa có tài khoản? <a href="#" id="switchToRegister">Đăng ký</a>
+    </p>
+
+    <p id="message" style="margin-top: 10px; color: yellow;"></p>
+  </div>
+
+  <script type="module">
+    import { register, login, auth, db, getUserData } from "./firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const usernameEl = document.getElementById("username");
+    const authBtn = document.getElementById("authBtn");
+    const messageEl = document.getElementById("message");
+    const formTitle = document.getElementById("formTitle");
+
+    let mode = "login"; // login / register
+
+    document.getElementById("switchToRegister").onclick = (e) => {
+      e.preventDefault();
+      if (mode === "login") {
+        mode = "register";
+        formTitle.textContent = "Đăng ký tài khoản";
+        usernameEl.style.display = "block";
+        authBtn.textContent = "Đăng ký";
+        e.target.textContent = "Đăng nhập";
+      } else {
+        mode = "login";
+        formTitle.textContent = "Đăng nhập";
+        usernameEl.style.display = "none";
+        authBtn.textContent = "Đăng nhập";
+        e.target.textContent = "Đăng ký";
+      }
+    };
+
+    authBtn.onclick = async () => {
+      const email = emailEl.value.trim();
+      const pass = passwordEl.value.trim();
+      const name = usernameEl.value.trim();
+
+      try {
+        if (mode === "login") {
+          await login(email, pass);
+          messageEl.textContent = "Đăng nhập thành công!";
+        } else {
+          await register(email, pass, name);
+          messageEl.textContent = "Đăng ký thành công!";
+        }
+      } catch (err) {
+        messageEl.textContent = err.message;
+      }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const info = await getUserData(user.uid);
+        if (!info) return;
+        if (info.role === "admin") window.location.href = "/admin.html";
+        else window.location.href = "/index.html";
+      }
+    });
+  </script>
+</body>
+</html>
