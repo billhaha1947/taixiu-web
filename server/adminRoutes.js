@@ -1,15 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const { db } = require("./firebaseAdmin");
+const { db } = require("./firebaseAdmin.js");
 
-router.get("/history", async (req, res) => {
+router.get("/clear", async (req, res) => {
   try {
-    const snapshot = await db.collection("games").orderBy("timestamp", "desc").limit(20).get();
-    const history = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    res.json({ success: true, history });
-  } catch (error) {
-    console.error("❌ Lỗi khi lấy lịch sử:", error);
-    res.status(500).json({ error: "Không thể lấy dữ liệu lịch sử" });
+    const snapshot = await db.collection("results").get();
+    const batch = db.batch();
+
+    snapshot.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+
+    res.json({ message: "🧹 Đã xóa toàn bộ lịch sử kết quả" });
+  } catch (err) {
+    console.error("❌ Error clearing results:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
