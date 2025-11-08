@@ -1,16 +1,15 @@
 {
-  "name": "taixiu-server",
+  "name": "taixiu-web",
   "version": "1.0.0",
+  "main": "server/server.js",
   "type": "module",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "socket.io": "^4.7.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "firebase-admin": "^12.3.0"
+    "firebase-admin": "^12.6.0"
   }
 }
