@@ -20,3 +20,12 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`✅ Server đang chạy trên cổng ${PORT}`);
 });
+// 🔐 API đăng nhập admin
+app.post("/api/login", (req, res) => {
+  const { password } = req.body;
+  if (password === process.env.ADMIN_PASSWORD) {
+    res.json({ success: true, message: "Đăng nhập thành công" });
+  } else {
+    res.status(401).json({ success: false, message: "Sai mật khẩu!" });
+  }
+});
