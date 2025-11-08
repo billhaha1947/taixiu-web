@@ -1,8 +1,6 @@
-// server/firebaseAdmin.js
 import admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 
-// Nếu chưa khởi tạo thì mới khởi tạo Firebase Admin (tránh lỗi khi hot reload)
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -16,8 +14,6 @@ if (!admin.apps.length) {
   });
 }
 
-// Lấy Firestore Database
 const db = getFirestore();
 
-// Xuất để file khác dùng
-export { admin, db };
+export default { admin, db }; // ✅ Dùng default export
