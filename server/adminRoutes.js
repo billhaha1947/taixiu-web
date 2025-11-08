@@ -1,6 +1,5 @@
 import express from "express";
-import { db } from "./firebaseAdmin.js";
-
+const { db } = require("./firebaseAdmin.js");
 const router = express.Router();
 
 // Lấy danh sách user
