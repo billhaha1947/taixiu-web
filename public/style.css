@@ -1,1 +1,67 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(120deg, #141e30, #243b55);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
 
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.3);
+}
+
+.title {
+  font-size: 2em;
+  margin-bottom: 15px;
+}
+
+.balance {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.bet-section button {
+  margin: 10px;
+  padding: 10px 20px;
+  background: #ffbb33;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.bet-section button:hover {
+  background: #ffaa00;
+}
+
+.dice-area {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.dice {
+  width: 60px;
+  height: 60px;
+  margin: 0 10px;
+  background: #fff;
+  border-radius: 10px;
+  background-size: cover;
+  transition: transform 0.5s ease-in-out;
+}
+
+.rank {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+}
