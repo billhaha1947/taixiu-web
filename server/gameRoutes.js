@@ -1,39 +1,21 @@
-import express from "express";
-const { db } = require("./firebaseAdmin.js");
-import { rollDice } from "./rollEngine.js";
-
+const express = require("express");
 const router = express.Router();
+const { rollDiceAndSaveResult } = require("./rollEngine");
 
-// Quay xúc xắc
-router.post("/roll", async (req, res) => {
+router.post("/play", async (req, res) => {
   try {
-    const result = rollDice();
-    await db.collection("games").add({
-      ...result,
-      createdAt: new Date(),
-    });
+    const { userId, betType, betAmount } = req.body;
+    if (!userId || !betType || !betAmount) {
+      return res.status(400).json({ error: "Thiếu dữ liệu đặt cược!" });
+    }
+
+    const result = await rollDiceAndSaveResult(userId, betType, betAmount);
     res.json({ success: true, result });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: err.message });
+
+  } catch (error) {
+    console.error("❌ Lỗi khi xử lý game:", error);
+    res.status(500).json({ error: "Lỗi máy chủ" });
   }
 });
 
-// Lịch sử
-router.get("/history", async (req, res) => {
-  try {
-    const snapshot = await db
-      .collection("games")
-      .orderBy("createdAt", "desc")
-      .limit(20)
-      .get();
-
-    const data = snapshot.docs.map((doc) => doc.data());
-    res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-export default router;
+module.exports = router;
