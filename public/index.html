@@ -3,41 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tài Xỉu Vui Vẻ 😎</title>
+  <title>Tài Xỉu Online</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">🎲 Game Tài Xỉu</h1>
+  <h1>🎲 Game Tài Xỉu</h1>
 
-    <div class="balance">Số dư: <span id="balance">0</span>₫</div>
-
-    <div class="bet-section">
-      <select id="betAmount">
-        <option value="10000">10,000₫</option>
-        <option value="20000">20,000₫</option>
-        <option value="50000">50,000₫</option>
-        <option value="100000">100,000₫</option>
-      </select>
-      <button id="betTai">Đặt Tài</button>
-      <button id="betXiu">Đặt Xỉu</button>
-    </div>
-
-    <div class="dice-area">
-      <div class="dice" id="dice1"></div>
-      <div class="dice" id="dice2"></div>
-      <div class="dice" id="dice3"></div>
-    </div>
-
+  <div class="game-box">
+    <button id="rollBtn">Quay Xúc Xắc 🎲</button>
     <div id="result"></div>
-
-    <div id="countdown">Vòng quay tiếp theo trong: <span id="timer">25</span>s</div>
-
-    <div class="rank">
-      <h3>Bảng xếp hạng 💰</h3>
-      <ul id="leaderboard"></ul>
-    </div>
   </div>
+
+  <h2>Lịch sử gần đây</h2>
+  <ul id="history"></ul>
 
   <script src="script.js"></script>
 </body>
