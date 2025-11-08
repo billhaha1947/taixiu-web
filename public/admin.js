@@ -1,15 +1,17 @@
-document.getElementById("updateBalance").onclick = () => {
-  const user = document.getElementById("userId").value.trim();
-  const money = Number(document.getElementById("newBalance").value);
+const API_URL = window.location.origin;
+const btn = document.getElementById("clearBtn");
+const status = document.getElementById("status");
 
-  if (!user || isNaN(money)) return alert("Nhập ID và số dư hợp lệ!");
-
-  fetch("/api/admin/updateBalance", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user, money }),
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message || "Cập nhật thành công"))
-  .catch(() => alert("Lỗi máy chủ"));
-};
+btn.addEventListener("click", async () => {
+  if (!confirm("Bạn chắc chắn muốn xóa toàn bộ lịch sử?")) return;
+  btn.disabled = true;
+  status.textContent = "Đang xóa...";
+  try {
+    const res = await fetch(`${API_URL}/admin/clear`);
+    const data = await res.json();
+    status.textContent = data.message;
+  } catch {
+    status.textContent = "Lỗi khi xóa dữ liệu!";
+  }
+  btn.disabled = false;
+});
