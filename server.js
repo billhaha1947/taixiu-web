@@ -1,36 +1,39 @@
-// server.js
 import express from "express";
-import http from "http";
-import { Server } from "socket.io";
-import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
-import { startAutoRoll } from "./server/rollEngine.js";
-import admin from "./server/firebaseAdmin.js";
+// Import các routes
+import adminRoutes from "./server/adminRoutes.js";
+import gameRoutes from "./server/gameRoutes.js";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.json());
-app.use(express.static("public")); // phục vụ file trong /public
+app.use(express.static(path.join(__dirname, "public")));
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" },
+// API routes
+app.use("/api/admin", adminRoutes);
+app.use("/api/game", gameRoutes);
+
+// Route cho frontend (index.html)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Khi client kết nối
-io.on("connection", (socket) => {
-  console.log("🟢 Client connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("🔴 Client disconnected:", socket.id);
-  });
+// Route cho admin
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
-// Bắt đầu auto roll xúc xắc
-startAutoRoll(io);
+// Route cho login
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
