@@ -2,8 +2,6 @@
 import { db } from './firebaseAdmin.js';
 import { Server } from "socket.io";
 
-const db = admin.firestore();
-
 // 🎲 Hàm tung xúc xắc (mode để chỉnh xác suất nếu cần)
 export function rollDice(mode = 1) {
   const dice1 = Math.floor(Math.random() * 6) + 1;
