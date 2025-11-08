@@ -1,9 +1,10 @@
+// server/firebaseAdmin.js
 import admin from "firebase-admin";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-admin.initializeApp({
+const app = admin.initializeApp({
   credential: admin.credential.cert({
     project_id: process.env.FIREBASE_PROJECT_ID,
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
@@ -11,6 +12,4 @@ admin.initializeApp({
   }),
 });
 
-const db = admin.firestore();
-
-export { admin, db };
+export default app;
