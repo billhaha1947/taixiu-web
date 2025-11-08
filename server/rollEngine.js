@@ -2,11 +2,10 @@ function rollDice() {
   const dice1 = Math.floor(Math.random() * 6) + 1;
   const dice2 = Math.floor(Math.random() * 6) + 1;
   const dice3 = Math.floor(Math.random() * 6) + 1;
-  const sum = dice1 + dice2 + dice3;
+  const total = dice1 + dice2 + dice3;
+  const result = total >= 11 ? "Tài" : "Xỉu";
 
-  let result = sum >= 11 ? "Tài" : "Xỉu";
-
-  return { dice1, dice2, dice3, sum, result };
+  return { dice: [dice1, dice2, dice3], total, result };
 }
 
 module.exports = rollDice;
