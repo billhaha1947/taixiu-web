@@ -8,24 +8,21 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-const gameRoutes = require("./server/gameRoutes.js");
-const adminRoutes = require("./server/adminRoutes.js");
+// Import routes
+const gameRoutes = require("./server/gameRoutes");
+const adminRoutes = require("./server/adminRoutes");
 
-app.use("/api/game", gameRoutes);
+app.use("/api", gameRoutes);
 app.use("/api/admin", adminRoutes);
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`✅ Server đang chạy trên cổng ${PORT}`);
+// Fallback route cho SPA
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-// 🔐 API đăng nhập admin
-app.post("/api/login", (req, res) => {
-  const { password } = req.body;
-  if (password === process.env.ADMIN_PASSWORD) {
-    res.json({ success: true, message: "Đăng nhập thành công" });
-  } else {
-    res.status(401).json({ success: false, message: "Sai mật khẩu!" });
-  }
-});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
