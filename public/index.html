@@ -1,34 +1,65 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Tài Xỉu</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tài Xỉu - Demo</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>🎲 Game Tài Xỉu</h1>
+  <main class="wrap">
+    <header>
+      <h1>🎲 Tài Xỉu (25s auto roll)</h1>
+      <div id="balance">Số dư: -</div>
+    </header>
 
-    <p id="balance">Số dư: ...</p>
+    <section class="game">
+      <div class="info">
+        <div id="totals">Tổng cược — Tài: 0 | Xỉu: 0</div>
+        <div id="countdown">⏳ Đang tải...</div>
+      </div>
 
-    <input id="betAmount" type="number" placeholder="Nhập số tiền cược">
-    <div class="btn-group">
-      <button id="taiBtn">Tài</button>
-      <button id="xiuBtn">Xỉu</button>
-    </div>
+      <div class="dice-area">
+        <div class="dice-container">
+          <div class="dice" id="dice1">
+            <div class="face front">1</div><div class="face back">6</div><div class="face right">3</div>
+            <div class="face left">4</div><div class="face top">5</div><div class="face bottom">2</div>
+          </div>
+          <div class="dice" id="dice2">
+            <div class="face front">1</div><div class="face back">6</div><div class="face right">3</div>
+            <div class="face left">4</div><div class="face top">5</div><div class="face bottom">2</div>
+          </div>
+        </div>
+      </div>
 
-    <button id="logoutBtn" class="logout">Đăng xuất</button>
+      <div class="controls">
+        <input id="bet" type="number" placeholder="Nhập cược (VD: 10000)" />
+        <button id="tai">Tài</button>
+        <button id="xiu">Xỉu</button>
+      </div>
 
-    <h3>Lịch sử gần đây</h3>
-    <div id="history"></div>
-  </div>
-  <div id="dice-container">
-  <img id="dice1" class="dice" src="dice1.png" alt="dice 1">
-  <img id="dice2" class="dice" src="dice2.png" alt="dice 2">
-</div>
+      <div id="resultStatus">Kết quả: -</div>
+    </section>
 
-<div id="result-text">Đang chờ tung xúc xắc...</div>
+    <aside class="side">
+      <div class="leaderboard">
+        <h3>Bảng xếp hạng</h3>
+        <ol id="leaderboardList"></ol>
+      </div>
 
-  <script type="module" src="./script.js"></script>
+      <div class="chat">
+        <h3>Chat</h3>
+        <div id="chatBox" class="chat-box"></div>
+        <input id="chatInput" placeholder="Gõ tin nhắn..." />
+        <button id="chatSend">Gửi</button>
+      </div>
+    </aside>
+  </main>
+
+  <audio id="sndRoll" src="sounds/roll.mp3"></audio>
+  <audio id="sndWin" src="sounds/win.mp3"></audio>
+  <audio id="sndLose" src="sounds/lose.mp3"></audio>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
