@@ -9,9 +9,7 @@
     "express": "^4.19.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "firebase-admin": "^12.6.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "firebase-admin": "^12.6.0",
+    "uuid": "^9.0.0"
   }
 }
