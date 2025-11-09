@@ -1,28 +1,37 @@
-// /server/adminRoutes.js
 const express = require("express");
 const router = express.Router();
-const { db } = require("./firebaseAdmin");
+const { admin } = require("./firebaseAdmin");
+const db = () => admin.firestore();
 
-// get top users by balance
-router.get("/users", async (req, res) => {
-  try {
-    const snap = await db.collection("users").orderBy("balance", "desc").limit(20).get();
-    const arr = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    res.json(arr);
-  } catch (err) {
-    res.status(500).json({ error: "Cannot load users" });
-  }
+const ADMIN_SECRET = process.env.ADMIN_SECRET || null;
+
+function checkAdmin(req, res, next){
+  const secret = req.headers["x-admin-secret"];
+  if (ADMIN_SECRET && secret === ADMIN_SECRET) return next();
+  return res.status(403).json({ error: "Forbidden" });
+}
+
+// list users
+router.get("/users", checkAdmin, async (req, res) => {
+  const snaps = await db().collection("users").get();
+  const arr = [];
+  snaps.forEach(s => arr.push({ id: s.id, ...s.data() }));
+  res.json(arr);
 });
 
-// admin adjust (for simplicity, no auth here — add auth in production)
-router.post("/adjust-balance", async (req, res) => {
-  try {
-    const { uid, balance } = req.body;
-    await db.collection("users").doc(uid).update({ balance });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: "Adjust failed" });
-  }
+// set user balance
+router.post("/user/set-balance", checkAdmin, async (req, res) => {
+  const { uid, balance } = req.body;
+  if (!uid) return res.status(400).json({ error: "Missing uid" });
+  await db().collection("users").doc(uid).set({ balance: Number(balance) }, { merge: true });
+  res.json({ ok: true });
+});
+
+// set odds (global)
+router.post("/settings/set-odds", checkAdmin, async (req, res) => {
+  const { odds } = req.body;
+  await db().collection("settings").doc("game").set({ odds }, { merge: true });
+  res.json({ ok: true });
 });
 
 module.exports = router;
