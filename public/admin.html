@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trang Admin</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Admin</title><link rel="stylesheet" href="style.css"/></head>
 <body>
-  <h1>🛠 Quản lý dữ liệu</h1>
-  <button id="clearBtn">Xóa toàn bộ lịch sử 🎯</button>
-  <p id="status"></p>
-  <button id="logoutBtn" style="margin-top:20px;">Đăng xuất</button>
-
-  <script src="admin.js"></script>
+  <h2>Admin panel</h2>
+  <div>
+    <button id="loadUsers">Load users</button>
+    <ul id="userList"></ul>
+  </div>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
