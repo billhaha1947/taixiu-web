@@ -1,37 +1,63 @@
-const API_URL = window.location.origin; // auto Render link
+const API_BASE = "https://taixiu-web-frxx.onrender.com/api";
+const userEmail = document.getElementById("userEmail");
+const balanceEl = document.getElementById("balance");
+const historyEl = document.getElementById("history");
+const resultBox = document.getElementById("resultBox");
 
-const rollBtn = document.getElementById("rollBtn");
-const resultBox = document.getElementById("result");
-const historyBox = document.getElementById("history");
+let currentUser = null;
 
-async function fetchHistory() {
+// Kiểm tra đăng nhập
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return (location.href = "login.html");
+  currentUser = user;
+  userEmail.textContent = `Xin chào: ${user.email}`;
+
+  // Lấy số dư
+  const doc = await db.collection("users").doc(user.uid).get();
+  balanceEl.textContent = doc.data()?.balance || 0;
+
+  loadHistory();
+});
+
+async function loadHistory() {
   try {
-    const res = await fetch(`${API_URL}/api/history`);
+    const res = await fetch(`${API_BASE}/history`);
     const data = await res.json();
-    historyBox.innerHTML = data
-      .map(r => `<li>${r.result} (${r.dice1},${r.dice2},${r.dice3}) - Tổng: ${r.sum}</li>`)
-      .join("");
+    historyEl.innerHTML = data.map(
+      h => `<li>${h.choice} - ${h.result} (${h.bet})</li>`
+    ).join("");
   } catch {
-    historyBox.innerHTML = "<li>Lỗi khi tải lịch sử!</li>";
+    historyEl.innerHTML = "<li>Lỗi khi tải lịch sử!</li>";
   }
 }
 
-async function rollDice() {
-  rollBtn.disabled = true;
-  resultBox.innerHTML = "🎲 Đang quay...";
+async function roll(choice) {
+  const bet = Number(document.getElementById("bet").value);
+  if (!bet) return alert("Nhập số tiền cược!");
+
   try {
-    const res = await fetch(`${API_URL}/api/roll`);
+    const res = await fetch(`${API_BASE}/roll`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: currentUser.uid, bet, choice }),
+    });
+
     const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
     resultBox.innerHTML = `
-      <p>Kết quả: <strong>${data.result}</strong></p>
-      <p>Xúc xắc: ${data.dice1}, ${data.dice2}, ${data.dice3} (Tổng: ${data.sum})</p>
+      🎲 Kết quả: ${data.dice.join(", ")} (${data.result})<br>
+      ${data.win ? "Bạn thắng!" : "Bạn thua!"}<br>
+      Số dư mới: ${data.newBalance}
     `;
-    await fetchHistory();
-  } catch {
+
+    balanceEl.textContent = data.newBalance;
+    loadHistory();
+  } catch (e) {
+    console.error(e);
     resultBox.innerHTML = "Lỗi khi quay!";
   }
-  rollBtn.disabled = false;
 }
 
-rollBtn.addEventListener("click", rollDice);
-fetchHistory();
+document.getElementById("taiBtn").onclick = () => roll("Tài");
+document.getElementById("xiuBtn").onclick = () => roll("Xỉu");
