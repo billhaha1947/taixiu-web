@@ -1,72 +1,41 @@
 <!doctype html>
-<html lang="vi">
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tài Xỉu</title>
-
   <link rel="stylesheet" href="style.css" />
-  <!-- three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- Firebase v10 (modular) -->
-  <script type="module" src="firebase.js" defer></script>
-  <script type="module" src="script.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">🎲 <span>Tài Xỉu (25s auto roll)</span></div>
-    <div class="user-area">
-      <span id="balance">Số dư: -</span>
-      <button id="logoutBtn" class="small hidden">Đăng xuất</button>
-    </div>
+  <header>
+    <h1>🎲 Game Tài Xỉu (25s auto roll)</h1>
+    <div id="topStats">Tổng cược — Tài: <span id="sumTai">0</span> | Xỉu: <span id="sumXiu">0</span></div>
   </header>
 
-  <main class="layout">
-    <section class="left">
-      <div class="bowl">
-        <div id="dice-container" class="dice-canvas"></div>
-        <div id="dice-overlay" class="dice-overlay">
-          <div id="sumText" class="sum-text">Kết quả: -</div>
-        </div>
+  <main>
+    <div class="table-left">
+      <div id="diceArea">
+        <img id="diceA" src="images/dice1.png" width="120" alt="dice 1"/>
+        <img id="diceB" src="images/dice1.png" width="120" alt="dice 2"/>
       </div>
 
-      <div class="controls">
-        <div class="countdown" id="countdown">⏳ Đang tải...</div>
-
-        <div class="bet-row">
-          <input id="bet" placeholder="Nhập cược (VD: 10000)" inputmode="numeric"/>
-          <button id="tai" class="btn-yellow">Tài</button>
-          <button id="xiu" class="btn-yellow">Xỉu</button>
-        </div>
-
-        <div class="totals" id="totals">Tổng cược — Tài: 0 | Xỉu: 0</div>
-
-        <div class="recent">
-          <h3>Lịch sử gần đây</h3>
-          <ul id="history"></ul>
-        </div>
+      <div class="bet-controls">
+        <input id="bet" placeholder="Nhập cược (VD: 10000)" />
+        <button id="btnTai">Tài</button>
+        <button id="btnXiu">Xỉu</button>
+        <div id="resultLine">Kết quả: <span id="resultText">-</span></div>
+        <div id="balance">Số dư: ...</div>
       </div>
-    </section>
+    </div>
 
-    <aside class="right">
-      <div class="card leaderboard">
-        <h3>Bảng xếp hạng</h3>
-        <ol id="leaderboard"></ol>
-      </div>
-
-      <div class="card chat">
-        <h3>Chat</h3>
-        <div id="chatBox" class="chat-box"></div>
-        <form id="chatForm" class="chat-form">
-          <input id="chatInput" placeholder="Gõ tin nhắn..." autocomplete="off"/>
-          <button type="submit">Gửi</button>
-        </form>
-      </div>
+    <aside class="sidebar">
+      <h3>Bảng xếp hạng</h3>
+      <ul id="leaderboard"></ul>
+      <h3>Chat</h3>
+      <div id="chatBox"> (chưa bật) </div>
     </aside>
   </main>
 
-  <footer class="footer">
-    <small>Phiên bản demo • 25s auto-roll • Bật/tắt server roll trong cấu hình</small>
-  </footer>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
