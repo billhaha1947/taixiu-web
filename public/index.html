@@ -2,20 +2,28 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tài Xỉu Online</title>
+  <title>Game Tài Xỉu</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase.js"></script>
 </head>
 <body>
-  <h1>🎲 Game Tài Xỉu</h1>
+  <div class="container">
+    <h1>🎲 Game Tài Xỉu</h1>
+    <p id="userEmail"></p>
+    <p>Số dư: <span id="balance">0</span> VNĐ</p>
+    <input type="number" id="bet" placeholder="Nhập số tiền cược" />
+    <div>
+      <button id="taiBtn">Tài</button>
+      <button id="xiuBtn">Xỉu</button>
+    </div>
+    <div id="resultBox"></div>
 
-  <div class="game-box">
-    <button id="rollBtn">Quay Xúc Xắc 🎲</button>
-    <div id="result"></div>
+    <h2>Lịch sử gần đây</h2>
+    <ul id="history"></ul>
   </div>
-
-  <h2>Lịch sử gần đây</h2>
-  <ul id="history"></ul>
 
   <script src="script.js"></script>
 </body>
