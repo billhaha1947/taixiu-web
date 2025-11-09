@@ -1,84 +1,66 @@
-// /server/gameRoutes.js
 const express = require("express");
 const router = express.Router();
-const { db } = require("./firebaseAdmin");
+const { admin } = require("./firebaseAdmin");
+const db = () => admin.firestore();
+const { v4: uuidv4 } = require("uuid");
 
-// get current round info
-router.get("/current", async (req, res) => {
-  try {
-    const snap = await db.collection("game").doc("current").get();
-    res.json(snap.exists ? snap.data() : {});
-  } catch (err) {
-    res.status(500).json({ error: "Cannot read current game" });
-  }
-});
-
-// place bet (server checks balance and reserves money by subtracting immediately)
+// POST /api/game/bet
+// body: { uid, choice: "Tài"|"Xỉu", amount }
 router.post("/bet", async (req, res) => {
   try {
-    const { uid, choice, amount, roundId } = req.body;
-    if (!uid || !choice || !amount || !roundId) return res.status(400).json({ error: "Missing fields" });
-    const userRef = db.collection("users").doc(uid);
+    const { uid, choice, amount } = req.body;
+    if (!uid || !choice || !amount) return res.status(400).json({ error: "Missing" });
+
+    // check user exists and balance
+    const userRef = db().collection("users").doc(uid);
     const userSnap = await userRef.get();
     if (!userSnap.exists) return res.status(404).json({ error: "User not found" });
-
-    // check balance
     const user = userSnap.data();
     if ((user.balance || 0) < amount) return res.status(400).json({ error: "Insufficient balance" });
 
-    // create bet doc and mark as unsettled
-    const betRef = db.collection("bets").doc();
-    await betRef.set({
+    // deduct balance immediately
+    await userRef.update({ balance: admin.firestore.FieldValue.increment(-amount) });
+
+    // create bet doc
+    const bet = {
       uid,
       choice,
       amount,
-      roundId: String(roundId),
+      odds: 2, // default odds
       createdAt: Date.now(),
-      settled: false,
-    });
+      processed: false
+    };
+    await db().collection("bets").add(bet);
 
-    // deduct immediately (reserve)
-    await userRef.update({ balance: (user.balance || 0) - amount });
-
-    // update aggregate totals in game/current
-    const gameRef = db.collection("game").doc("current");
-    await db.runTransaction(async (t) => {
-      const gsnap = await t.get(gameRef);
-      const data = gsnap.exists ? gsnap.data() : { totalBetTai:0, totalBetXiu:0 };
-      if (choice === "Tài") data.totalBetTai = (data.totalBetTai || 0) + amount;
-      else data.totalBetXiu = (data.totalBetXiu || 0) + amount;
-      t.update(gameRef, { totalBetTai: data.totalBetTai, totalBetXiu: data.totalBetXiu });
-    });
-
-    res.json({ success: true, message: "Bet placed" });
+    return res.json({ ok: true, message: "Bet placed" });
   } catch (err) {
-    console.error("bet error:", err);
-    res.status(500).json({ error: "Bet failed" });
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
-// get recent history
+// GET /api/game/current
+router.get("/current", async (req, res) => {
+  const snap = await db().doc("game/current").get();
+  return res.json(snap.exists ? snap.data() : {});
+});
+
+// GET /api/game/history?limit=10
 router.get("/history", async (req, res) => {
-  try {
-    const snap = await db.collection("history").orderBy("ts", "desc").limit(20).get();
-    const arr = snap.docs.map(d => d.data());
-    res.json(arr);
-  } catch (err) {
-    res.status(500).json({ error: "Cannot load history" });
-  }
+  const limit = parseInt(req.query.limit || "10", 10);
+  const snaps = await db().collection("game").doc("history").collection("rolls")
+    .orderBy("timestamp", "desc").limit(limit).get();
+  const arr = [];
+  snaps.forEach(s => arr.push(s.data()));
+  res.json(arr);
 });
 
-// chat: post a chat message (optional)
-router.post("/chat", async (req, res) => {
-  try {
-    const { uid, name, text } = req.body;
-    if (!text) return res.status(400).json({ error: "Empty text" });
-    const docRef = db.collection("chats").doc();
-    await docRef.set({ uid: uid || "anon", name: name || "Anon", text, ts: Date.now() });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: "Chat failed" });
-  }
+// GET /api/game/top (simple leaderboard by balance)
+router.get("/top", async (req, res) => {
+  const snaps = await db().collection("users").orderBy("balance", "desc").limit(10).get();
+  const arr = [];
+  snaps.forEach(s => arr.push({ uid: s.id, ...s.data() }));
+  res.json(arr);
 });
 
 module.exports = router;
