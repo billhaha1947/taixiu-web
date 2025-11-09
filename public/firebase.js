@@ -1,29 +1,9 @@
-// firebase.js (module)
+<!-- public/firebase.js -->
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ====== REPLACE with your Firebase Web SDK config (Client-side) ======
-  From Firebase Console -> Project Settings -> Your apps -> SDK config
-*/
 const firebaseConfig = {
   apiKey: "AIzaSyBufJXyP6xLal_nJrfAWNHu4mr9D2gr2V8",
   authDomain: "taixiu-17879.firebaseapp.com",
@@ -37,9 +17,5 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* Exports commonly used methods for other modules */
-export {
-  app, auth, db,
-  collection, doc, setDoc, getDoc, onSnapshot, addDoc, query, orderBy, limit, serverTimestamp,
-  signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut
-};
+export { auth, db, onAuthStateChanged, signOut };
+</script>
