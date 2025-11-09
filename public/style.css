@@ -75,3 +75,85 @@ li {
   75% { transform: rotate(10deg); }
   100% { transform: rotate(0deg); }
 }
+.dice-animation {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 999;
+}
+
+.dice-animation .dice {
+  font-size: 80px;
+  animation: shake 1s infinite;
+}
+
+.dice-animation .result-text {
+  font-size: 22px;
+  color: #ffcc00;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+#countdown {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #00ffcc;
+  margin-top: 10px;
+  text-shadow: 0 0 8px #00ffcc;
+}
+
+#balance {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #00ffcc;
+}
+
+input#bet {
+  width: 120px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 10px;
+  outline: none;
+}
+
+#history {
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  scrollbar-width: thin;
+}
+
+#history::-webkit-scrollbar {
+  width: 6px;
+}
+
+#history::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+button:disabled {
+  background: #777;
+  cursor: not-allowed;
+}
+
+/* Hiệu ứng highlight khi đặt cược */
+.bet-selected {
+  box-shadow: 0 0 15px #00ffcc;
+  transform: scale(1.05);
+  background: #00ffcc;
+  color: #000;
+  transition: 0.2s;
+}
