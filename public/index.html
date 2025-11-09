@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Game Tài Xỉu</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebase.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>🎲 Game Tài Xỉu</h1>
-    <p id="userEmail"></p>
-    <p>Số dư: <span id="balance">0</span> VNĐ</p>
-    <input type="number" id="bet" placeholder="Nhập số tiền cược" />
-    <div>
+
+    <p id="balance">Số dư: ...</p>
+
+    <input id="betAmount" type="number" placeholder="Nhập số tiền cược">
+    <div class="btn-group">
       <button id="taiBtn">Tài</button>
       <button id="xiuBtn">Xỉu</button>
     </div>
-    <div id="resultBox"></div>
 
-    <h2>Lịch sử gần đây</h2>
-    <ul id="history"></ul>
+    <button id="logoutBtn" class="logout">Đăng xuất</button>
+
+    <h3>Lịch sử gần đây</h3>
+    <div id="history"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
