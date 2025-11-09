@@ -1,65 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tài Xỉu - Demo</title>
+  <title>Tài Xỉu</title>
+
   <link rel="stylesheet" href="style.css" />
+  <!-- three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Firebase v10 (modular) -->
+  <script type="module" src="firebase.js" defer></script>
+  <script type="module" src="script.js" defer></script>
 </head>
 <body>
-  <main class="wrap">
-    <header>
-      <h1>🎲 Tài Xỉu (25s auto roll)</h1>
-      <div id="balance">Số dư: -</div>
-    </header>
+  <header class="topbar">
+    <div class="brand">🎲 <span>Tài Xỉu (25s auto roll)</span></div>
+    <div class="user-area">
+      <span id="balance">Số dư: -</span>
+      <button id="logoutBtn" class="small hidden">Đăng xuất</button>
+    </div>
+  </header>
 
-    <section class="game">
-      <div class="info">
-        <div id="totals">Tổng cược — Tài: 0 | Xỉu: 0</div>
-        <div id="countdown">⏳ Đang tải...</div>
-      </div>
-
-      <div class="dice-area">
-        <div class="dice-container">
-          <div class="dice" id="dice1">
-            <div class="face front">1</div><div class="face back">6</div><div class="face right">3</div>
-            <div class="face left">4</div><div class="face top">5</div><div class="face bottom">2</div>
-          </div>
-          <div class="dice" id="dice2">
-            <div class="face front">1</div><div class="face back">6</div><div class="face right">3</div>
-            <div class="face left">4</div><div class="face top">5</div><div class="face bottom">2</div>
-          </div>
+  <main class="layout">
+    <section class="left">
+      <div class="bowl">
+        <div id="dice-container" class="dice-canvas"></div>
+        <div id="dice-overlay" class="dice-overlay">
+          <div id="sumText" class="sum-text">Kết quả: -</div>
         </div>
       </div>
 
       <div class="controls">
-        <input id="bet" type="number" placeholder="Nhập cược (VD: 10000)" />
-        <button id="tai">Tài</button>
-        <button id="xiu">Xỉu</button>
-      </div>
+        <div class="countdown" id="countdown">⏳ Đang tải...</div>
 
-      <div id="resultStatus">Kết quả: -</div>
+        <div class="bet-row">
+          <input id="bet" placeholder="Nhập cược (VD: 10000)" inputmode="numeric"/>
+          <button id="tai" class="btn-yellow">Tài</button>
+          <button id="xiu" class="btn-yellow">Xỉu</button>
+        </div>
+
+        <div class="totals" id="totals">Tổng cược — Tài: 0 | Xỉu: 0</div>
+
+        <div class="recent">
+          <h3>Lịch sử gần đây</h3>
+          <ul id="history"></ul>
+        </div>
+      </div>
     </section>
 
-    <aside class="side">
-      <div class="leaderboard">
+    <aside class="right">
+      <div class="card leaderboard">
         <h3>Bảng xếp hạng</h3>
-        <ol id="leaderboardList"></ol>
+        <ol id="leaderboard"></ol>
       </div>
 
-      <div class="chat">
+      <div class="card chat">
         <h3>Chat</h3>
         <div id="chatBox" class="chat-box"></div>
-        <input id="chatInput" placeholder="Gõ tin nhắn..." />
-        <button id="chatSend">Gửi</button>
+        <form id="chatForm" class="chat-form">
+          <input id="chatInput" placeholder="Gõ tin nhắn..." autocomplete="off"/>
+          <button type="submit">Gửi</button>
+        </form>
       </div>
     </aside>
   </main>
 
-  <audio id="sndRoll" src="sounds/roll.mp3"></audio>
-  <audio id="sndWin" src="sounds/win.mp3"></audio>
-  <audio id="sndLose" src="sounds/lose.mp3"></audio>
-
-  <script type="module" src="script.js"></script>
+  <footer class="footer">
+    <small>Phiên bản demo • 25s auto-roll • Bật/tắt server roll trong cấu hình</small>
+  </footer>
 </body>
 </html>
