@@ -1,19 +1,20 @@
-require("dotenv").config();
+// ==== FIX GRPC DECODER ERROR ====
 process.env.GRPC_SSL_CIPHER_SUITES = "HIGH+ECDSA";
 process.env.NODE_OPTIONS = "--openssl-legacy-provider";
 
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// ==== INIT FIREBASE ADMIN TRƯỚC ====
+// ==== INIT FIREBASE ADMIN ====
 const { initFirebase } = require("./server/firebaseAdmin");
 const admin = initFirebase();
 if (!admin) {
   console.warn("⚠️ Firebase Admin chưa được khởi tạo — kiểm tra biến môi trường FIREBASE_KEY");
 }
 
-// ==== EXPRESS APP CONFIG ====
+// ==== EXPRESS CONFIG ====
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -25,7 +26,7 @@ const adminRoutes = require("./server/adminRoutes");
 app.use("/api/game", gameRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ==== ENGINE ====
+// ==== START ROLL ENGINE ====
 const { startRolling } = require("./server/rollEngine");
 startRolling(25 * 1000); // mỗi 25s
 
