@@ -6,15 +6,13 @@ const admin = require("firebase-admin");
 
 function tryParseServiceAccount(envVal) {
   if (!envVal) return null;
-  // nếu là base64 encoded (tuỳ Render setup)
   try {
     const maybeJson = Buffer.from(envVal, 'base64').toString('utf8');
-    const parsed = JSON.parse(maybeJson);
-    return parsed;
-  } catch (e) { /* not base64 */ }
+    return JSON.parse(maybeJson);
+  } catch {}
   try {
     return JSON.parse(envVal);
-  } catch (e) {
+  } catch {
     return null;
   }
 }
