@@ -1,54 +1,50 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Đăng nhập</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebase.js"></script>
+  <meta charset="UTF-8">
+  <title>Đăng nhập - Tài Xỉu</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="login-page">
   <div class="login-container">
-    <h1>🎲 Đăng Nhập Tài Xỉu</h1>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Mật khẩu" />
-    <button id="loginBtn">Đăng nhập</button>
-    <button id="signupBtn">Đăng ký</button>
+    <h1>🎲 Đăng nhập / Đăng ký 🎲</h1>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Mật khẩu">
+
+    <div class="btn-group">
+      <button id="loginBtn">Đăng nhập</button>
+      <button id="signupBtn">Đăng ký</button>
+    </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "./firebase.js";
+
     const loginBtn = document.getElementById("loginBtn");
     const signupBtn = document.getElementById("signupBtn");
 
-    loginBtn.onclick = async () => {
-      const email = email.value.trim();
-      const pass = password.value.trim();
+    loginBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       try {
-        await auth.signInWithEmailAndPassword(email, pass);
-        location.href = "index.html";
-      } catch (e) {
-        alert("Sai tài khoản hoặc mật khẩu!");
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "index.html";
+      } catch (err) {
+        alert("❌ Lỗi đăng nhập: " + err.message);
       }
-    };
+    });
 
-    signupBtn.onclick = async () => {
-      const email = email.value.trim();
-      const pass = password.value.trim();
+    signupBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       try {
-        const userCred = await auth.createUserWithEmailAndPassword(email, pass);
-        await db.collection("users").doc(userCred.user.uid).set({
-          email,
-          balance: 10000,
-          createdAt: new Date()
-        });
-        alert("Đăng ký thành công!");
-        location.href = "index.html";
-      } catch (e) {
-        alert("Lỗi đăng ký!");
+        await createUserWithEmailAndPassword(auth, email, password);
+        window.location.href = "index.html";
+      } catch (err) {
+        alert("❌ Lỗi đăng ký: " + err.message);
       }
-    };
+    });
   </script>
 </body>
 </html>
