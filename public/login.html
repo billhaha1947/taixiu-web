@@ -1,50 +1,16 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Đăng nhập - Tài Xỉu</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body class="login-page">
-  <div class="login-container">
-    <h1>🎲 Đăng nhập / Đăng ký 🎲</h1>
-
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Mật khẩu">
-
-    <div class="btn-group">
-      <button id="loginBtn">Đăng nhập</button>
-      <button id="signupBtn">Đăng ký</button>
-    </div>
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Login</title><link rel="stylesheet" href="style.css"/></head>
+<body>
+  <h2>Đăng nhập / Đăng ký</h2>
+  <div>
+    <input id="email" placeholder="Email" />
+    <input id="password" placeholder="Mật khẩu" type="password" />
+    <button id="btnLogin">Đăng nhập</button>
+    <button id="btnRegister">Đăng ký</button>
   </div>
 
-  <script type="module">
-    import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "./firebase.js";
-
-    const loginBtn = document.getElementById("loginBtn");
-    const signupBtn = document.getElementById("signupBtn");
-
-    loginBtn.addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "index.html";
-      } catch (err) {
-        alert("❌ Lỗi đăng nhập: " + err.message);
-      }
-    });
-
-    signupBtn.addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        window.location.href = "index.html";
-      } catch (err) {
-        alert("❌ Lỗi đăng ký: " + err.message);
-      }
-    });
-  </script>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="login.js"></script>
 </body>
 </html>
