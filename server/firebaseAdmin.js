@@ -1,18 +1,23 @@
+// ====== /server/firebaseAdmin.js ======
 const admin = require("firebase-admin");
 
 try {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+  // Giải mã key base64
+  const keyBase64 = process.env.FIREBASE_KEY_BASE64;
+  if (!keyBase64) throw new Error("Thiếu FIREBASE_KEY_BASE64 trong .env hoặc Render!");
+
+  const serviceAccount = JSON.parse(Buffer.from(keyBase64, "base64").toString("utf8"));
 
   if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
-    console.log("✅ Firebase Admin initialized successfully");
+    console.log("✅ Firebase Admin khởi tạo thành công");
   }
 
   const db = admin.firestore();
   module.exports = { db };
-} catch (error) {
-  console.error("❌ Firebase Admin initialization failed:", error);
-  throw new Error("Firebase initialization error");
+} catch (err) {
+  console.error("❌ Firebase Admin lỗi:", err);
+  throw err;
 }
