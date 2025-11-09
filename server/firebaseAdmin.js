@@ -1,5 +1,6 @@
-// Fix lỗi gRPC Decoder routines trên Render
+// Fix lỗi OpenSSL decoder trên Render / Alpine
 process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA';
+process.env.NODE_OPTIONS = '--openssl-legacy-provider';
 
 const admin = require("firebase-admin");
 
