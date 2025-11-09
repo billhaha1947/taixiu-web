@@ -57,3 +57,21 @@ li {
   width: 80%;
   max-width: 400px;
 }
+.dice {
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+  transition: transform 0.3s ease;
+}
+
+.shake {
+  animation: shake 1s infinite;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
