@@ -1,35 +1,32 @@
-// ====== server.js ======
+// server.js (root)
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const app = express();
+// init firebase admin (this file loads server/firebaseAdmin.js)
+require("./server/firebaseAdmin");
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-// Import routes
 const gameRoutes = require("./server/gameRoutes");
 const adminRoutes = require("./server/adminRoutes");
 const { startRolling } = require("./server/rollEngine");
 
-// Routes
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// serve static
+app.use(express.static(path.join(__dirname, "public")));
+
+// api
 app.use("/api/game", gameRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Test route
-app.get("/api", (req, res) => {
-  res.json({ message: "✅ API đang hoạt động" });
-});
+// simple ping
+app.get("/api", (req, res) => res.json({ ok: true }));
 
-// Bắt đầu engine xúc xắc (mỗi 25s roll 1 lần)
+// start rolling engine
 startRolling();
 
-// Lắng nghe port
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
