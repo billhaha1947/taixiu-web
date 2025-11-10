@@ -1,46 +1,40 @@
 const express = require("express");
 const router = express.Router();
 
-// Lưu tạm trạng thái game trong RAM
+// Lưu tạm trạng thái game trong bộ nhớ
 let gameState = {
-  result: null,
-  lastRoll: null,
-  nextRoll: null,
-  round: 0
+  result: null,     // Kết quả xúc xắc hiện tại
+  lastRoll: null,   // Lần quay trước
+  nextRoll: null,   // Thời gian lần quay kế tiếp
+  round: 0,         // Số vòng quay
 };
 
-// API: Lấy trạng thái hiện tại của game
+// Lấy trạng thái game hiện tại
 router.get("/state", (req, res) => {
   try {
     res.json(gameState);
   } catch (err) {
     console.error("[ERR] /state:", err);
-    res.status(500).json({ error: "Lỗi lấy trạng thái game" });
+    res.status(500).json({ error: "Lỗi lấy game state" });
   }
 });
 
-// API: Người chơi đặt cược (chưa xử lý logic Firebase)
-router.post("/bet", (req, res) => {
-  const { userId, betType, amount } = req.body;
-  if (!userId || !betType || !amount) {
-    return res.status(400).json({ error: "Thiếu thông tin cược" });
-  }
+// Hàm cập nhật kết quả game (được gọi từ rollEngine)
+function updateGameState(result) {
+  const now = Date.now();
 
-  console.log(`🎲 Người chơi ${userId} cược ${amount} vào ${betType}`);
-  res.json({ success: true });
-});
+  gameState.lastRoll = gameState.result;
+  gameState.result = result;
+  gameState.nextRoll = now + 25000; // 25s nữa quay tiếp
+  gameState.round += 1;
 
-// Hàm này sẽ được rollEngine gọi để cập nhật kết quả
-function updateGameState(newResult) {
-  gameState = {
-    result: newResult,
-    lastRoll: Date.now(),
-    nextRoll: Date.now() + 25 * 1000,
-    round: gameState.round + 1
-  };
-  console.log("🎯 Game state updated:", gameState);
+  console.log(
+    `🎲 Vòng ${gameState.round}:`,
+    result.dice1,
+    result.dice2,
+    result.dice3
+  );
 }
 
-// Xuất cả router + hàm cập nhật cho rollEngine dùng
 module.exports = router;
 module.exports.updateGameState = updateGameState;
