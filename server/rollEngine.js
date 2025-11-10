@@ -1,5 +1,5 @@
+// server/rollEngine.js
 const { admin } = require("./firebaseAdmin");
-const { updateGameState } = require("./gameRoutes");
 
 function db() {
   return admin.firestore();
@@ -18,7 +18,7 @@ function decideResult(sum) {
 function startRolling(intervalMs = 25000) {
   if (timer) clearInterval(timer);
   console.log("🎯 Roll engine started, interval:", intervalMs);
-  rollOnce(intervalMs); // chạy ngay lần đầu
+  rollOnce(intervalMs);
   timer = setInterval(() => rollOnce(intervalMs), intervalMs);
 }
 
@@ -27,15 +27,11 @@ async function rollOnce(intervalMs) {
     const now = Date.now();
     const nextRollAt = now + intervalMs;
 
-    // Ghi trạng thái "đang chờ" cho client
-    await db().doc("game/current").set(
-      {
-        nextRoll: nextRollAt,
-        timestamp: now,
-        status: "waiting",
-      },
-      { merge: true }
-    );
+    await db().doc("game/current").set({
+      nextRoll: nextRollAt,
+      timestamp: now,
+      status: "waiting",
+    }, { merge: true });
 
     console.log("⌛ Chờ đến lần quay tiếp theo...");
 
@@ -59,9 +55,6 @@ async function rollOnce(intervalMs) {
       await db().doc("game/current").set(rollData, { merge: true });
       await settleBets(rollData);
 
-      // cập nhật cho gameRoutes.js (cho /api/game/state)
-      updateGameState(rollData);
-
       console.log(`🎲 ${result} (${d1},${d2},${d3}) - sum ${sum}`);
     }, intervalMs);
   } catch (err) {
@@ -83,29 +76,15 @@ async function settleBets(rollData) {
       const payout = win ? b.amount * (b.odds || 2) : 0;
 
       const userRef = db().collection("users").doc(b.uid);
-      batch.update(docSnap.ref, {
-        processed: true,
-        win,
-        payout,
-        result: rollData.result,
-      });
-
-      batch.set(
-        userRef,
-        { balance: admin.firestore.FieldValue.increment(payout) },
-        { merge: true }
-      );
+      batch.update(docSnap.ref, { processed: true, win, payout, result: rollData.result });
+      batch.set(userRef, { balance: admin.firestore.FieldValue.increment(payout) }, { merge: true });
 
       totalPayout += payout;
     });
 
     await batch.commit();
     await db().collection("game").doc("history").collection("rolls").add(rollData);
-
-    await db()
-      .collection("system")
-      .doc("stats")
-      .set({ lastRoll: rollData, updated: Date.now() }, { merge: true });
+    await db().collection("system").doc("stats").set({ lastRoll: rollData, updated: Date.now() }, { merge: true });
 
     console.log(`💰 Tổng tiền trả: ${totalPayout}`);
   } catch (err) {
