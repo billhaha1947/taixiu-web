@@ -1,101 +1,131 @@
-// public/script.js
-import { auth, db, onAuthStateChanged } from "./firebase.js";
-import { doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// ====== 🔧 DEBUG CONSOLE HIỂN THỊ TRÊN MÀN HÌNH (cho điện thoại) ======
+(function () {
+  const logBox = document.createElement("div");
+  logBox.style.position = "fixed";
+  logBox.style.bottom = "0";
+  logBox.style.left = "0";
+  logBox.style.right = "0";
+  logBox.style.maxHeight = "40vh";
+  logBox.style.overflowY = "auto";
+  logBox.style.background = "rgba(0,0,0,0.8)";
+  logBox.style.color = "lime";
+  logBox.style.fontSize = "12px";
+  logBox.style.zIndex = 9999;
+  logBox.style.padding = "6px";
+  logBox.style.fontFamily = "monospace";
+  document.body.appendChild(logBox);
 
-const diceA = document.getElementById("diceA");
-const diceB = document.getElementById("diceB");
-const btnTai = document.getElementById("btnTai");
-const btnXiu = document.getElementById("btnXiu");
+  const print = (type, ...args) => {
+    const msg = document.createElement("div");
+    msg.textContent = `[${type}] ${args
+      .map(a => (typeof a === "object" ? JSON.stringify(a) : a))
+      .join(" ")}`;
+    logBox.appendChild(msg);
+    logBox.scrollTop = logBox.scrollHeight;
+  };
+
+  const origLog = console.log;
+  const origErr = console.error;
+  const origWarn = console.warn;
+
+  console.log = (...a) => {
+    origLog(...a);
+    print("LOG", ...a);
+  };
+  console.error = (...a) => {
+    origErr(...a);
+    print("ERR", ...a);
+  };
+  console.warn = (...a) => {
+    origWarn(...a);
+    print("WARN", ...a);
+  };
+})();
+
+// ====== 🎲 GAME TÀI XỈU SCRIPT ======
+
+const diceEls = document.querySelectorAll(".dice img");
 const betInput = document.getElementById("bet");
-const resultText = document.getElementById("resultText");
+const btnTai = document.getElementById("bet-tai");
+const btnXiu = document.getElementById("bet-xiu");
+const resultEl = document.getElementById("result");
 const balanceEl = document.getElementById("balance");
-const leaderboardEl = document.getElementById("leaderboard");
-const sumTai = document.getElementById("sumTai");
-const sumXiu = document.getElementById("sumXiu");
 
-let currentUser = null;
+let currentGame = null;
+let bets = { tai: 0, xiu: 0 };
+let balance = 10000;
 
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  if (user) {
-    // load balance from firestore user doc
-    loadBalance();
-  } else {
-    // redirect to login
-    if (!window.location.pathname.includes("login.html")) {
-      window.location.href = "login.html";
-    }
-  }
-});
-
-async function loadBalance(){
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const bal = snap.exists() ? (snap.data().balance || 0) : 0;
-  balanceEl.innerText = `Số dư: ${bal.toLocaleString()} VND`;
-}
-
-async function placeBet(choice){
-  if (!currentUser) return alert("Đăng nhập để cược");
-  const amount = parseInt(betInput.value || "0", 10);
-  if (!amount || amount <= 0) return alert("Nhập số tiền hợp lệ");
-  const res = await fetch("/api/game/bet", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ uid: currentUser.uid, choice, amount })
-  });
-  const j = await res.json();
-  if (j.error) alert("Lỗi: " + j.error);
-  else {
-    alert("Đặt cược thành công");
-    loadBalance();
+// Lấy trạng thái game từ server
+async function fetchGameState() {
+  try {
+    const res = await fetch("/api/game/state");
+    const data = await res.json();
+    currentGame = data;
+    console.log("🌀 Game state:", data);
+    updateUI();
+  } catch (e) {
+    console.error("❌ Lỗi fetchGameState:", e);
   }
 }
 
-btnTai.addEventListener("click", () => placeBet("Tài"));
-btnXiu.addEventListener("click", () => placeBet("Xỉu"));
-
-// realtime listen to game/current
-const currentDoc = doc(db, "game", "current");
-onSnapshot(currentDoc, (snap) => {
-  if (!snap.exists()) return;
-  const d = snap.data();
-  if (d.dice1) {
-    diceA.src = `images/dice3d/${String(d.dice1).padStart(2,'0')}.png`;
-    diceB.src = `images/dice3d/${String(d.dice2).padStart(2,'0')}.png`;
-    resultText.innerText = `${d.sum} (${d.result})`;
-  }
-  // nextRoll countdown
-  if (d.nextRoll) {
-    startCountdown(d.nextRoll);
-  }
-});
-
-// leader board
-async function loadTop(){
-  const res = await fetch("/api/game/top");
-  const j = await res.json();
-  leaderboardEl.innerHTML = "";
-  j.forEach(u => {
-    const li = document.createElement("li");
-    li.innerText = `${u.email || u.id}: ${ (u.balance||0).toLocaleString() }`;
-    leaderboardEl.appendChild(li);
-  });
+// Cập nhật giao diện
+function updateUI() {
+  if (!currentGame) return;
+  document.getElementById("total-bet").textContent = `Tổng cược — Tài: ${bets.tai} | Xỉu: ${bets.xiu}`;
+  resultEl.textContent = `Kết quả: ${currentGame.result || "-"} `;
+  balanceEl.textContent = `Số dư: ${balance}`;
 }
-loadTop();
 
-let countdownTimer = null;
-function startCountdown(nextTs){
-  clearInterval(countdownTimer);
-  let sec = Math.max(0, Math.floor((nextTs - Date.now())/1000));
-  const top = document.getElementById("topStats");
-  top.querySelector("span#sumTai"); // keep layout
-  countdownTimer = setInterval(() => {
-    sec--;
-    if (sec <= 0) {
-      clearInterval(countdownTimer);
-      top.querySelector("#sumTai");
+// Gửi cược
+async function placeBet(type) {
+  const amount = parseInt(betInput.value);
+  if (isNaN(amount) || amount <= 0) {
+    alert("Nhập số tiền hợp lệ!");
+    return;
+  }
+
+  if (balance < amount) {
+    alert("Không đủ số dư!");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/game/bet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, amount }),
+    });
+    const data = await res.json();
+    console.log("📤 Đặt cược:", data);
+
+    if (data.success) {
+      balance -= amount;
+      bets[type] += amount;
+      updateUI();
     } else {
-      top.innerHTML = `⏳ Đang tải... Còn ${sec}s để đặt cược`;
+      alert("Đặt cược thất bại!");
     }
-  }, 1000);
+  } catch (e) {
+    console.error("⚠️ Lỗi gửi cược:", e);
+  }
 }
+
+// Xử lý kết quả xúc xắc
+function updateDice(dice) {
+  diceEls[0].src = `images/dice1.png`;
+  diceEls[1].src = `images/dice2.png`;
+  if (dice && dice.length === 2) {
+    diceEls[0].src = `images/dice${dice[0]}.png`;
+    diceEls[1].src = `images/dice${dice[1]}.png`;
+  }
+}
+
+// Auto cập nhật mỗi 5s
+setInterval(fetchGameState, 5000);
+
+// Gán sự kiện
+btnTai.onclick = () => placeBet("tai");
+btnXiu.onclick = () => placeBet("xiu");
+
+// Lấy trạng thái ban đầu
+fetchGameState();
