@@ -1,39 +1,34 @@
-// ==== FIX GRPC DECODER ERROR ====
-process.env.GRPC_SSL_CIPHER_SUITES = "HIGH+ECDSA";
-process.env.NODE_OPTIONS = "--openssl-legacy-provider";
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// ==== INIT FIREBASE ADMIN ====
-const { initFirebase } = require("./server/firebaseAdmin");
-const admin = initFirebase();
-if (!admin) {
-  console.warn("⚠️ Firebase Admin chưa được khởi tạo — kiểm tra biến môi trường FIREBASE_KEY");
-}
-
-// ==== EXPRESS CONFIG ====
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ==== ROUTES ====
+// === INIT FIREBASE ADMIN ===
+const { initFirebase } = require("./server/firebaseAdmin");
+initFirebase();
+
+// === ROUTES ===
 const gameRoutes = require("./server/gameRoutes");
 const adminRoutes = require("./server/adminRoutes");
+const { startRolling } = require("./server/rollEngine");
+
+// Gắn route
 app.use("/api/game", gameRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ==== START ROLL ENGINE ====
-const { startRolling } = require("./server/rollEngine");
-startRolling(25 * 1000); // mỗi 25s
+app.get("/api", (req, res) => {
+  res.json({ ok: true, msg: "Server đang chạy ổn định ✅" });
+});
 
-// ==== TEST ROUTE ====
-app.get("/api", (req, res) => res.json({ ok: true }));
+// === KHỞI ĐỘNG VÒNG QUAY GAME ===
+startRolling(25 * 1000); // quay mỗi 25s
 
-// ==== START SERVER ====
+// === KHỞI ĐỘNG SERVER ===
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT}`);
