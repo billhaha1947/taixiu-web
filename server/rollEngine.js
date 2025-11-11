@@ -1,5 +1,5 @@
-// server/rollEngine.js
 const { admin } = require("./firebaseAdmin");
+const { updateGameState } = require("./gameState"); // ✅ import đúng file
 
 function db() {
   return admin.firestore();
@@ -18,6 +18,7 @@ function decideResult(sum) {
 function startRolling(intervalMs = 25000) {
   if (timer) clearInterval(timer);
   console.log("🎯 Roll engine started, interval:", intervalMs);
+
   rollOnce(intervalMs);
   timer = setInterval(() => rollOnce(intervalMs), intervalMs);
 }
@@ -55,7 +56,8 @@ async function rollOnce(intervalMs) {
       await db().doc("game/current").set(rollData, { merge: true });
       await settleBets(rollData);
 
-      console.log(`🎲 ${result} (${d1},${d2},${d3}) - sum ${sum}`);
+      updateGameState(rollData); // ✅ đồng bộ sang frontend
+
     }, intervalMs);
   } catch (err) {
     console.error("❌ Lỗi rollOnce:", err);
